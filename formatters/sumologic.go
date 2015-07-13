@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/behance/go-logrus"
 )
@@ -16,7 +17,12 @@ type SumologicFormatter struct{}
 func (f SumologicFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 	b := &bytes.Buffer{}
 
-	fmt.Fprintf(b, "APP_NAME='%s' ", appName())
+	fmt.Fprintf(
+		b,
+		"APP_NAME='%s' SEVERITY='%s' ",
+		appName(),
+		strings.ToUpper(entry.Level.String()),
+	)
 	// KVEntryString in the kv.go file
 	fmt.Fprintf(b, KVEntryString(entry))
 	fmt.Fprintln(b)
