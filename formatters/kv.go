@@ -19,13 +19,21 @@ func KVEntryString(entry *logrus.Entry) string {
 		keys = append(keys, k)
 	}
 
-	strentry := fmt.Sprintf("MESSAGE='%s'", entry.Message)
+	strentry := "MESSAGE=" + singleQuoteString(entry.Message)
 	for _, k := range keys {
 		v := entry.Data[k]
-		strentry = fmt.Sprintf("%s %s='%+v'", strentry, strings.ToUpper(k), v)
+		s, ok := v.(string)
+		if ok {
+			v = s
+		}
+		strentry = strentry + " " + strings.ToUpper(k) + "=" + singleQuoteString(s)
 	}
 
 	return strentry
+}
+
+func singleQuoteString(s string) string {
+	return "'" + strings.Replace(s, "'", "\\'", -1) + "'"
 }
 
 // Format - See logrus.Formatter.Format for docs
